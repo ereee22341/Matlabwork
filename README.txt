@@ -1,0 +1,53 @@
+F2-b 一维增透膜课程设计计算程序
+================================
+
+运行环境
+已在 Windows / MATLAB R2024a 实际运行验证；代码按 R2020b 及以上版本编写，
+不依赖额外工具箱。旧版本兼容性未单独实机验证。
+
+运行方法
+在 MATLAB 中打开 main.m 并运行。入口会自动定位工程目录，不需要修改绝对路径。
+所有结果写入 output/；重复运行会覆盖同名结果。完整计算与绘图在本机约 17 秒。
+运行中自动验证解析解、无膜界面、能量守恒、网格收敛、运行时长敏感性和双层膜结果。
+报告和 PPT 尚未制作。
+
+文件作用
+main.m              一键运行，组织全部计算、检查、数据表和绘图。
+config_f2b.m        F2-b 物理参数、网格、时间步、频率点和输出目录。
+tmm_spectrum.m      多层介质特征矩阵参考解；采用 exp(+j*w*t) 约定。
+fdtd_run.m          自编 Yee 电磁场更新、软源、局部波速 Mur 和介质分配。
+fdtd_spectrum.m     参考/结构两次仿真，反射场相减与 FFT 归一化。
+validate_baseline.m 无膜与单层模型的独立解析校验及 FDTD 基础检查。
+reflection_band.m   提取包含设计频率的连续低反射频带。
+make_figures.m      自动生成所有 PNG 和可编辑 FIG。
+ALGORITHM.md        建模、离散公式、边界和误差定义的计算说明。
+
+必交图与输出对应关系（每张同时生成 .png 和 .fig）
+结构示意图           output/01_structure
+时域波形             output/03_time_waveforms
+反射谱对比           output/05_reflection_comparison
+透射谱对比           output/06_transmission_comparison
+膜厚 ±10% 反射谱     output/08_thickness_sensitivity
+网格误差分析         output/09_grid_convergence、10_thickness_rounding
+双层膜必做扩展       output/11_double_layer
+FDTD 组共同要求       output/02_yee_grid
+补充验证图           output/04_field_snapshots、07_energy_balance、
+                     12_source_spectrum、13_time_sensitivity
+
+数据文件
+output/results.mat            全部主要计算数据、参数、误差和分析表。
+output/baseline.mat           无膜和单层基础验证数据。
+output/baseline_spectra.csv    单层的 FDTD/TMM 反射谱、电场透射平方、功率透射谱。
+output/grid_errors.csv        三档网格的 RMS 误差及最大功率守恒偏差。
+output/bandwidths.csv         单层/双层的 FDTD/TMM 低于 1% 反射率带宽。
+output/thickness_minima.csv   厚度变化对应的理论/FDTD 反射谷频率。
+output/validation_metrics.csv 基础验证、时长敏感性和扩展误差。
+
+定义与使用注意
+程序中 r、t 是电场系数，R=|r|^2，t2=|t|^2，T=3|t|^2 是功率透射率。
+无耗时 R+T=1。数值 RMS 为功率比例的绝对误差，不能称为相对误差。
+0 GHz 作为频谱极限展示，不参与 RMS；其余 0.02~12 GHz 全部通过激励幅度检查。
+膜层按电场节点控制体积的材料占比平均介电常数，基底延伸到右边界。
+主单层使用 20 个膜厚网格；收敛采用 10/20/40；双层使用 d0/40 的空间步长。
+output/ 为可重建结果，未纳入 Git；源码、参数、公式说明和本说明纳入 Git。
+如需恢复：先用 git log --oneline 查看提交，再选择所需版本；保留当前修改后再操作。

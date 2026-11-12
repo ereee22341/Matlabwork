@@ -2,7 +2,8 @@ function s = fdtd_spectrum(indices, thicknesses, dz, cfg)
 % Identical source/monitor geometry in reference and structure simulations.
 ref=fdtd_run(indices,thicknesses,dz,cfg,true);
 obj=fdtd_run(indices,thicknesses,dz,cfg,false);
-Nfft=2^nextpow2(numel(obj.time)*4);
+% Dense FFT sampling prevents interpolation from shifting the reflection notch.
+Nfft=2^nextpow2(numel(obj.time)*32);
 freq=(0:Nfft/2)/(Nfft*obj.dt);
 inc=fft(ref.er,Nfft); incT=fft(ref.et,Nfft);
 refl=fft(obj.er-ref.er,Nfft); trans=fft(obj.et,Nfft);

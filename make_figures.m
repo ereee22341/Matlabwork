@@ -1,6 +1,6 @@
 function make_figures(cfg,num,theory,thickness,thickTheory,grids,gt,...
     rounded,roundTheory,dual,dualTheory,longRun)
-% Export PNG previews and editable FIG; PDF vector charts for later writing.
+% Export high-resolution PNG previews and editable MATLAB FIG files.
 f=cfg.f/1e9; colors=lines(3);
 newfig();
 subplot(2,1,1); hold on;
@@ -58,9 +58,17 @@ xlabel('Grid spacing (mm)'); ylabel('RMS error (power fraction)'); legend('Refle
 newfig(); plot(f,theory.R,'k-',f,roundTheory.R,'b-',f,rounded.R,'r--','LineWidth',1.3);
 legend('TMM: design thickness','TMM: rounded thickness','FDTD: rounded thickness');
 xlabel('Frequency (GHz)'); ylabel('Reflectance |r|^2'); grid on; title('Geometry rounding vs discretization'); finish('10_thickness_rounding');
-newfig(); plot(f,theory.R,'b-',f,num.R,'b--',f,dualTheory.R,'r-',f,dual.R,'r--','LineWidth',1.3); hold on;
+newfig(); subplot(2,1,1); plot(f,theory.R,'b-',f,num.R,'b--',f,dualTheory.R,'r-',f,dual.R,'r--','LineWidth',1.3); hold on;
 yline(.01,'k:','1% threshold'); legend('Single TMM','Single FDTD','Double TMM','Double FDTD','Location','best');
-xlabel('Frequency (GHz)'); ylabel('Reflectance |r|^2'); grid on; title('Single vs double quarter-wave coating'); finish('11_double_layer');
+xlabel('Frequency (GHz)'); ylabel('Reflectance |r|^2'); grid on; title('Single vs double quarter-wave coating');
+subplot(2,1,2); plot(f,theory.R,'b-',f,num.R,'b--',f,dualTheory.R,'r-',f,dual.R,'r--','LineWidth',1.3); hold on;
+yline(.01,'k:'); bs=reflection_band(cfg.f,num.R,cfg.f0,.01); bd=reflection_band(cfg.f,dual.R,cfg.f0,.01);
+plot(bs(1:2)/1e9,[.01 .01],'bo','MarkerFaceColor','b');
+plot(bd(1:2)/1e9,[.01 .01],'ro','MarkerFaceColor','r');
+xlim([4 8]); ylim([0 .025]); grid on;
+xlabel('Frequency (GHz)'); ylabel('Reflectance |r|^2');
+title(sprintf('FDTD fractional bandwidth: single %.2f%%; double %.2f%%',100*bs(3),100*bd(3)));
+finish('11_double_layer');
 newfig(); plot(f,num.sourceLevel,'LineWidth',1.3); yline(1e-3,'k--');
 xlabel('Frequency (GHz)'); ylabel('Normalized spectral amplitude'); grid on; title('Incident source bandwidth'); finish('12_source_spectrum');
 newfig(); plot(f,longRun.R-num.R,f,longRun.T-num.T,'LineWidth',1.3);
