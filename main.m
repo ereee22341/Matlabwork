@@ -86,5 +86,10 @@ writetable(table(names,cell2mat(values),'VariableNames',{'Metric','Value'}),...
 disp(gridTable); disp(bandTable); disp(thicknessTable); disp(metrics);
 fprintf('Reflectance convergence orders: %.3f, %.3f\n',orderR);
 fprintf('Completed in %.2f s. Outputs: %s\n',elapsed,cfg.outdir);
+if cfg.showFigures
+    fprintf('13 figure windows are available in MATLAB; PNG and FIG copies are saved in output.\n');
+else
+    fprintf('Batch mode: figures are saved in output. Open a PNG or FIG file to view a plot.\n');
+end
 assert(elapsed<300,'Runtime exceeds 5 minutes');
 

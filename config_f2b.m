@@ -14,5 +14,6 @@ cfg.dz = cfg.d0/20;
 cfg.tau = 35e-12;
 cfg.t0 = 6*cfg.tau;
 cfg.tend = 1.85e-9;
+cfg.showFigures = usejava('desktop'); % Keep plots open in interactive MATLAB.
 cfg.outdir = fullfile(fileparts(mfilename('fullpath')),'output');
 end

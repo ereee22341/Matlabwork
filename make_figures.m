@@ -1,6 +1,9 @@
 function make_figures(cfg,num,theory,thickness,thickTheory,grids,gt,...
     rounded,roundTheory,dual,dualTheory,longRun)
 % Export high-resolution PNG previews and editable MATLAB FIG files.
+showFigures=usejava('desktop');
+if isfield(cfg,'showFigures'), showFigures=cfg.showFigures; end
+fig=[];
 f=cfg.f/1e9; colors=lines(3);
 newfig();
 subplot(2,1,1); hold on;
@@ -75,11 +78,19 @@ newfig(); plot(f,longRun.R-num.R,f,longRun.T-num.T,'LineWidth',1.3);
 legend('Reflectance change','Transmittance change'); xlabel('Frequency (GHz)'); ylabel('Change (power fraction)'); grid on;
 title('Duration sensitivity: 1.85 ns vs 2.15 ns'); finish('13_time_sensitivity');
     function newfig()
-        figure('Color','w','Position',[100 100 1000 700],'Visible','off');
+        fig=figure('Color','w','Position',[100 100 1000 700],'Visible','off');
     end
     function finish(name)
-        set(findall(gcf,'Type','axes'),'FontSize',11);
-        exportgraphics(gcf,fullfile(cfg.outdir,[name,'.png']),'Resolution',180);
-        savefig(gcf,fullfile(cfg.outdir,[name,'.fig'])); close(gcf);
+        set(fig,'Name',name,'NumberTitle','off');
+        set(findall(fig,'Type','axes'),'FontSize',11);
+        exportgraphics(fig,fullfile(cfg.outdir,[name,'.png']),'Resolution',180);
+        savefig(fig,fullfile(cfg.outdir,[name,'.fig']));
+        if showFigures
+            if usejava('desktop'), set(fig,'WindowStyle','docked'); end
+            set(fig,'Visible','on');
+            drawnow;
+        else
+            close(fig);
+        end
     end
 end

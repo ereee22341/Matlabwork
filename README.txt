@@ -8,6 +8,12 @@ F2-b 一维增透膜课程设计计算程序
 运行方法
 在 MATLAB 中打开 main.m 并运行。入口会自动定位工程目录，不需要修改绝对路径。
 也可以在命令窗口直接输入 main。
+在 MATLAB 桌面中运行时，会保留并显示全部 13 张图，默认停靠在图窗区域，
+可以切换图窗标签查看。PNG 和可编辑 FIG 文件仍同步保存在 output 文件夹。
+命令行批量运行时默认只导出文件，不打开图窗。
+如需在桌面中也只导出图片，可将 config_f2b.m 中的 cfg.showFigures 改为 false。
+查看已有结果无需重新计算，例如：
+openfig(fullfile('output','05_reflection_comparison.fig'),'visible');
 fdtd_spectrum 是计算单次频谱的函数，不是完整项目入口。现在直接输入
 s = fdtd_spectrum; 会使用默认 F2-b 参数计算单层频谱，结果保存在变量 s 中；
 这种调用不会生成全套图表。生成所有图表请运行 main。
