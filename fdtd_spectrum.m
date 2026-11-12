@@ -6,7 +6,10 @@ Nfft=2^nextpow2(numel(obj.time)*4);
 freq=(0:Nfft/2)/(Nfft*obj.dt);
 inc=fft(ref.er,Nfft); incT=fft(ref.et,Nfft);
 refl=fft(obj.er-ref.er,Nfft); trans=fft(obj.et,Nfft);
-sel=1:Nfft/2+1;
+sel=find(freq<=max(cfg.f)+2/(Nfft*obj.dt) & ...
+    abs(inc(1:numel(freq)))>1e-8*max(abs(inc)) & ...
+    abs(incT(1:numel(freq)))>1e-8*max(abs(incT)));
+freq=freq(sel);
 % Interpolate power ratios rather than complex phases at remote monitors.
 rp=abs(refl(sel)./inc(sel)).^2;
 tp=abs(trans(sel)./incT(sel)).^2;
