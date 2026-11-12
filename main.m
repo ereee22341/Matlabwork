@@ -22,7 +22,7 @@ for k=1:3
         sqrt(mean((grids{k}.T(valid)-theory.T(valid)).^2)),...
         max(abs(grids{k}.R(valid)+grids{k}.T(valid)-1))];
 end
-assert(all(errors(end,1:2)<errors(1,1:2)),'Refinement failed to improve RMS');
+assert(all(all(diff(errors(:,1:2),1,1)<0)),'Refinement failed to improve RMS monotonically');
 gridTable=table(cells',cfg.d0./cells'*1e3,errors(:,1),errors(:,2),errors(:,3),...
     'VariableNames',{'FilmCells','dz_mm','R_RMS','T_RMS','EnergyMax'});
 writetable(gridTable,fullfile(cfg.outdir,'grid_errors.csv'));
@@ -63,9 +63,10 @@ for k=1:3
     [~,ix]=min(thickness{k}.R);
     xx=cfg.f(ix-1:ix+1)/1e9; yy=thickness{k}.R(ix-1:ix+1);
     p=polyfit(xx-xx(2),yy,2); fmin=xx(2)-p(2)/(2*p(1));
-    minima(k,:)=[scales(k),cfg.d0*scales(k)*1e3,6/scales(k),fmin,...
+    minima(k,:)=[scales(k),cfg.d0*scales(k)*1e3,cfg.f0/1e9/scales(k),fmin,...
         sqrt(mean((thickness{k}.R(thickness{k}.valid)-thickTheory{k}.R(thickness{k}.valid)).^2))];
 end
+assert(all(abs(minima(:,4)-minima(:,3))<.01),'Reflection minimum frequency error exceeds 10 MHz');
 thicknessTable=array2table(minima,'VariableNames',...
     {'ThicknessScale','d_mm','TheoryMinimum_GHz','FDTDMinimum_GHz','R_RMS'});
 writetable(thicknessTable,fullfile(cfg.outdir,'thickness_minima.csv'));

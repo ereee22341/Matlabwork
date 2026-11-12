@@ -7,6 +7,13 @@ F2-b 一维增透膜课程设计计算程序
 
 运行方法
 在 MATLAB 中打开 main.m 并运行。入口会自动定位工程目录，不需要修改绝对路径。
+也可以在命令窗口直接输入 main。
+fdtd_spectrum 是计算单次频谱的函数，不是完整项目入口。现在直接输入
+s = fdtd_spectrum; 会使用默认 F2-b 参数计算单层频谱，结果保存在变量 s 中；
+这种调用不会生成全套图表。生成所有图表请运行 main。
+自定义调用示例：
+cfg = config_f2b();
+s = fdtd_spectrum(cfg.nfilm,cfg.d0,cfg.dz,cfg);
 所有结果写入 output/；重复运行会覆盖同名结果。完整计算与绘图在本机约 17 秒。
 运行中自动验证解析解、无膜界面、能量守恒、网格收敛、运行时长敏感性和双层膜结果。
 报告和 PPT 尚未制作。
@@ -16,7 +23,7 @@ main.m              一键运行，组织全部计算、检查、数据表和绘
 config_f2b.m        F2-b 物理参数、网格、时间步、频率点和输出目录。
 tmm_spectrum.m      多层介质特征矩阵参考解；采用 exp(+j*w*t) 约定。
 fdtd_run.m          自编 Yee 电磁场更新、软源、局部波速 Mur 和介质分配。
-fdtd_spectrum.m     参考/结构两次仿真，反射场相减与 FFT 归一化。
+fdtd_spectrum.m     参考/结构两次仿真，反射场相减与 FFT 归一化；支持无参数默认调用。
 validate_baseline.m 无膜与单层模型的独立解析校验及 FDTD 基础检查。
 reflection_band.m   提取包含设计频率的连续低反射频带。
 make_figures.m      自动生成所有 PNG 和可编辑 FIG。

@@ -2,13 +2,14 @@ function run = fdtd_run(indices, thicknesses, dz, cfg, reference)
 % 1D Ex/Hy Yee solver. E at integer z,t; H at half-integer z,t.
 % Soft electric source, local-speed first-order Mur, nodal volume averaging.
 if nargin<5, reference=false; end
+validateattributes(cfg.S,{'numeric'},{'real','finite','scalar','positive','<=',1},mfilename,'cfg.S');
 dt=cfg.S*dz/cfg.c0;
 snap=@(x) round(x/dz)*dz;
 zsrc=snap(0.35); zref=snap(0.40); zfront=snap(0.45);
 zback=zfront+sum(thicknesses);
 ztrans=snap(zback+0.04);
 z=0:dz:snap(ztrans+0.12);
-N=numel(z); Nt=ceil(cfg.tend/dt); time=(0:Nt-1)*dt;
+N=numel(z); Nt=ceil(cfg.tend/dt)+1; time=(0:Nt-1)*dt;
 isrc=round(zsrc/dz)+1; ir=round(zref/dz)+1; it=round(ztrans/dz)+1;
 epsr=ones(1,N);
 if ~reference
@@ -27,7 +28,8 @@ E=zeros(1,N); H=zeros(1,N-1); er=zeros(1,Nt); et=er;
 snapTimes=[0.40,0.65,0.95]*1e-9;
 snapSteps=round(snapTimes/dt)+1; fields=zeros(numel(snapSteps),N);
 source=2*cfg.S*exp(-((time-cfg.t0)/cfg.tau).^2);
-for j=1:Nt
+% Column 1 is E(t=0)=0. Each subsequent update records E at its actual time.
+for j=2:Nt
     oldLeft=E(1:2); oldRight=E(end-1:end);
     H=H-ch*diff(E);
     E(2:end-1)=E(2:end-1)-ce(2:end-1).*diff(H);
