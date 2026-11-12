@@ -1,5 +1,5 @@
 function s = tmm_spectrum(f, indices, thicknesses, cfg)
-% Characteristic matrices for exp(+j*w*t); order is air -> substrate.
+% 采用 exp(+j*w*t) 时间约定，特征矩阵按空气侧至基底侧依次相乘。
 assert(numel(indices)==numel(thicknesses));
 A=ones(size(f)); B=zeros(size(f)); C=B; D=A;
 for k=1:numel(indices)

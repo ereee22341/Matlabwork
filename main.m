@@ -1,4 +1,4 @@
-%% F2-b: run this entry point to regenerate all analyses and figures.
+%% F2-b 主入口：重新计算全部结果并生成图表。
 clear; clc; close all;
 root=fileparts(mfilename('fullpath')); addpath(root);
 cfg=config_f2b();
@@ -7,13 +7,13 @@ timer=tic;
 metrics=validate_baseline(cfg);
 base=load(fullfile(cfg.outdir,'baseline.mat'));
 num=base.num; theory=base.theory;
-%% Thickness sensitivity.
+%% 膜厚偏差分析。
 scales=[.9,1,1.1]; thickness=cell(1,3); thickTheory=thickness;
 for k=1:3
     thickness{k}=fdtd_spectrum(cfg.nfilm,cfg.d0*scales(k),cfg.dz,cfg);
     thickTheory{k}=tmm_spectrum(cfg.f,cfg.nfilm,cfg.d0*scales(k),cfg);
 end
-%% Convergence at fixed physical thickness, integer film-cell counts.
+%% 固定物理膜厚，用整数网格划分研究收敛性。
 cells=[10,20,40]; grids=cell(1,3); errors=zeros(3,3);
 for k=1:3
     grids{k}=fdtd_spectrum(cfg.nfilm,cfg.d0,cfg.d0/cells(k),cfg);
@@ -22,19 +22,19 @@ for k=1:3
         sqrt(mean((grids{k}.T(valid)-theory.T(valid)).^2)),...
         max(abs(grids{k}.R(valid)+grids{k}.T(valid)-1))];
 end
-assert(all(all(diff(errors(:,1:2),1,1)<0)),'Refinement failed to improve RMS monotonically');
+assert(all(all(diff(errors(:,1:2),1,1)<0)),'网格加密后，均方根误差未单调减小。');
 gridTable=table(cells',cfg.d0./cells'*1e3,errors(:,1),errors(:,2),errors(:,3),...
     'VariableNames',{'FilmCells','dz_mm','R_RMS','T_RMS','EnergyMax'});
 writetable(gridTable,fullfile(cfg.outdir,'grid_errors.csv'));
-% Observed orders are meaningful here because physical geometry stays fixed.
+% 物理几何保持不变，因此可用相邻网格的误差比估计收敛阶。
 orderR=log2(errors(1:end-1,1)./errors(2:end,1));
 orderT=log2(errors(1:end-1,2)./errors(2:end,2));
-%% Rounding: compare both intended and actual geometry against TMM.
+%% 膜厚取整：分别与设计厚度及实际厚度的 TMM 结果比较。
 roundDz=cfg.c0/(2*cfg.f0*cfg.ns*20);
 roundD=round(cfg.d0/roundDz)*roundDz;
 rounded=fdtd_spectrum(cfg.nfilm,roundD,roundDz,cfg);
 roundTheory=tmm_spectrum(cfg.f,cfg.nfilm,roundD,cfg);
-%% Required double-layer extension: order is air -> substrate.
+%% 必做扩展：双层增透膜，层顺序从空气侧指向基底侧。
 dualN=[3^(1/4),3^(3/4)]; dualD=cfg.c0./(4*cfg.f0*dualN);
 dualTheory=tmm_spectrum(cfg.f,dualN,dualD,cfg);
 dual=fdtd_spectrum(dualN,dualD,cfg.d0/40,cfg);
@@ -49,15 +49,15 @@ bandTable=table({'Single TMM';'Double TMM';'Single FDTD';'Double FDTD'},...
     bands(:,1)/1e9,bands(:,2)/1e9,bands(:,3)*100,...
     'VariableNames',{'Method','Lower_GHz','Upper_GHz','FractionalBW_percent'});
 writetable(bandTable,fullfile(cfg.outdir,'bandwidths.csv'));
-%% Time truncation sensitivity, still before principal Mur round trips.
+%% 仿真时长敏感性：记录窗口仍在主要边界往返波到达之前。
 longCfg=cfg; longCfg.tend=2.15e-9;
 longRun=fdtd_spectrum(cfg.nfilm,cfg.d0,cfg.dz,longCfg);
 metrics.timeSensitivityR=max(abs(longRun.R-num.R));
 metrics.timeSensitivityT=max(abs(longRun.T-num.T));
 metrics.dualRrms=sqrt(mean((dual.R(dual.valid)-dualTheory.R(dual.valid)).^2));
-assert(metrics.timeSensitivityR<.005 && metrics.timeSensitivityT<.005,'Time sensitivity too large');
-assert(metrics.dualRrms<.01,'Double-layer error too large');
-% Tabulate minima using parabolic interpolation around the sampled minimum.
+assert(metrics.timeSensitivityR<.005 && metrics.timeSensitivityT<.005,'改变仿真时长后，频谱变化超过允许范围。');
+assert(metrics.dualRrms<.01,'双层膜反射谱误差超过允许范围。');
+% 在最低点附近进行三点抛物线插值，估计反射谷的频率。
 minima=zeros(3,5);
 for k=1:3
     [~,ix]=min(thickness{k}.R);
@@ -66,7 +66,7 @@ for k=1:3
     minima(k,:)=[scales(k),cfg.d0*scales(k)*1e3,cfg.f0/1e9/scales(k),fmin,...
         sqrt(mean((thickness{k}.R(thickness{k}.valid)-thickTheory{k}.R(thickness{k}.valid)).^2))];
 end
-assert(all(abs(minima(:,4)-minima(:,3))<.01),'Reflection minimum frequency error exceeds 10 MHz');
+assert(all(abs(minima(:,4)-minima(:,3))<.01),'反射谷频率与理论值的偏差超过 10 MHz。');
 thicknessTable=array2table(minima,'VariableNames',...
     {'ThicknessScale','d_mm','TheoryMinimum_GHz','FDTDMinimum_GHz','R_RMS'});
 writetable(thicknessTable,fullfile(cfg.outdir,'thickness_minima.csv'));
@@ -83,13 +83,6 @@ writetable(spectrumTable,fullfile(cfg.outdir,'baseline_spectra.csv'));
 names=fieldnames(metrics); values=struct2cell(metrics);
 writetable(table(names,cell2mat(values),'VariableNames',{'Metric','Value'}),...
     fullfile(cfg.outdir,'validation_metrics.csv'));
-disp(gridTable); disp(bandTable); disp(thicknessTable); disp(metrics);
-fprintf('Reflectance convergence orders: %.3f, %.3f\n',orderR);
-fprintf('Completed in %.2f s. Outputs: %s\n',elapsed,cfg.outdir);
-if cfg.showFigures
-    fprintf('13 figure windows are available in MATLAB; PNG and FIG copies are saved in output.\n');
-else
-    fprintf('Batch mode: figures are saved in output. Open a PNG or FIG file to view a plot.\n');
-end
-assert(elapsed<300,'Runtime exceeds 5 minutes');
+print_summary(cfg,gridTable,bandTable,thicknessTable,metrics,orderR,orderT,elapsed);
+assert(elapsed<300,'完整运行时间超过任务书规定的 5 分钟。');
 

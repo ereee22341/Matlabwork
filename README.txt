@@ -10,6 +10,8 @@ F2-b 一维增透膜课程设计计算程序
 也可以在命令窗口直接输入 main。
 在 MATLAB 桌面中运行时，会保留并显示全部 13 张图，默认停靠在图窗区域，
 可以切换图窗标签查看。PNG 和可编辑 FIG 文件仍同步保存在 output 文件夹。
+图题、图例、坐标轴和图窗名称使用中文，优先选择微软雅黑字体。
+物理符号、单位、函数名及数据字段保持标准写法，便于计算和数据处理。
 命令行批量运行时默认只导出文件，不打开图窗。
 如需在桌面中也只导出图片，可将 config_f2b.m 中的 cfg.showFigures 改为 false。
 查看已有结果无需重新计算，例如：
@@ -33,6 +35,7 @@ fdtd_spectrum.m     参考/结构两次仿真，反射场相减与 FFT 归一化
 validate_baseline.m 无膜与单层模型的独立解析校验及 FDTD 基础检查。
 reflection_band.m   提取包含设计频率的连续低反射频带。
 make_figures.m      自动生成所有 PNG 和可编辑 FIG。
+print_summary.m     输出中文运行摘要并生成中文结果汇总文件。
 ALGORITHM.md        建模、离散公式、边界和误差定义的计算说明。
 
 必交图与输出对应关系（每张同时生成 .png 和 .fig）
@@ -55,6 +58,7 @@ output/grid_errors.csv        三档网格的 RMS 误差及最大功率守恒偏
 output/bandwidths.csv         单层/双层的 FDTD/TMM 低于 1% 反射率带宽。
 output/thickness_minima.csv   厚度变化对应的理论/FDTD 反射谷频率。
 output/validation_metrics.csv 基础验证、时长敏感性和扩展误差。
+output/results_summary.txt    可直接阅读的中文结果汇总；CSV 原有字段名继续保留。
 
 定义与使用注意
 程序中 r、t 是电场系数，R=|r|^2，t2=|t|^2，T=3|t|^2 是功率透射率。

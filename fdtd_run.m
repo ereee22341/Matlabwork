@@ -1,6 +1,6 @@
 function run = fdtd_run(indices, thicknesses, dz, cfg, reference)
-% 1D Ex/Hy Yee solver. E at integer z,t; H at half-integer z,t.
-% Soft electric source, local-speed first-order Mur, nodal volume averaging.
+% 一维 Ex/Hy Yee 求解器：电场位于整数时空节点，磁场位于半整数节点。
+% 使用电场软源、当地介质波速的一阶 Mur 边界及节点控制体积平均。
 if nargin<5, reference=false; end
 validateattributes(cfg.S,{'numeric'},{'real','finite','scalar','positive','<=',1},mfilename,'cfg.S');
 dt=cfg.S*dz/cfg.c0;
@@ -28,7 +28,7 @@ E=zeros(1,N); H=zeros(1,N-1); er=zeros(1,Nt); et=er;
 snapTimes=[0.40,0.65,0.95]*1e-9;
 snapSteps=round(snapTimes/dt)+1; fields=zeros(numel(snapSteps),N);
 source=2*cfg.S*exp(-((time-cfg.t0)/cfg.tau).^2);
-% Column 1 is E(t=0)=0. Each subsequent update records E at its actual time.
+% 首个记录为 E(t=0)=0，后续场更新与记录时刻一一对应。
 for j=2:Nt
     oldLeft=E(1:2); oldRight=E(end-1:end);
     H=H-ch*diff(E);
