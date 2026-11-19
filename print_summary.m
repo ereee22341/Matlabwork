@@ -35,10 +35,11 @@ say('能量守恒最大偏差：%.4f%%；无膜界面反射率均方根误差：
 say('入射频谱最低归一化幅度：%.6g。\n',metrics.sourceMin);
 say('时长变化引起的最大差异：反射率 %.6g，透射率 %.6g。\n',...
     metrics.timeSensitivityR,metrics.timeSensitivityT);
+say('透射电场系数模平方的均方根误差：%.6g。\n',metrics.t2rms);
 say('双层膜反射率均方根误差：%.6g。\n',metrics.dualRrms);
 say('\n计算与绘图用时：%.2f 秒。输出目录：%s\n',elapsed,cfg.outdir);
 if cfg.showFigures
-    say('已显示并保留 13 个图窗，同时保存 PNG 图片和可编辑 FIG 文件。\n');
+    say('已显示并保留 14 个图窗，同时保存 PNG 图片和可编辑 FIG 文件。\n');
 else
     say('当前为批量运行模式，图表已保存到 output 文件夹，可打开 PNG 或 FIG 查看。\n');
 end

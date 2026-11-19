@@ -12,7 +12,7 @@ end
 figureTitles={'结构示意图','Yee 网格示意图','时域波形','电场空间快照',...
     '反射谱对比','透射谱对比','能量守恒检验','膜厚偏差分析',...
     '网格收敛分析','膜厚取整误差分析','双层增透膜扩展',...
-    '激励频谱覆盖范围','仿真时长敏感性分析'};
+    '激励频谱覆盖范围','仿真时长敏感性分析','计算程序的执行流程'};
 fig=[];
 f=cfg.f/1e9; colors=lines(3);
 newfig();
@@ -87,6 +87,24 @@ xlabel('频率 f (GHz)'); ylabel('归一化入射频谱幅度'); grid on; title(
 newfig(); plot(f,longRun.R-num.R,f,longRun.T-num.T,'LineWidth',1.3);
 legend('功率反射率变化','功率透射率变化'); xlabel('频率 f (GHz)'); ylabel('变化量（功率比例）'); grid on;
 title(sprintf('仿真时长敏感性：%.2f ns 与 %.2f ns',cfg.tend*1e9,longRun.run.time(end)*1e9)); finish('13_time_sensitivity');
+    % 报告图 3-1 的流程：按行折返排列，由箭头标明运行顺序。
+    newfig(); ax=axes('Parent',fig); axis(ax,[0 3 0 3]); axis(ax,'off'); hold(ax,'on');
+    centers=[0.50 2.48;1.50 2.48;2.50 2.48;2.50 1.51;1.50 1.51;0.50 1.51;0.50 0.54];
+    labels={{'参数与介质分布','确定网格和时间步'},{'全空气参考仿真','记录左右入射场'},...
+        {'含膜结构仿真','记录总场与透射场'},{'相减提取反射场','FFT 与频谱归一化'},...
+        {'TMM 与解析式校验','误差和能量守恒'},{'膜厚与网格分析','双层增透膜扩展'},...
+        {'生成图表并保存数据','检查收敛和运行时间'}};
+    for step=1:numel(labels)
+        pos=centers(step,:);
+        rectangle(ax,'Position',[pos-[0.42 0.26],0.84,0.52],'EdgeColor',[0.2 0.3 0.3]);
+        text(ax,pos(1),pos(2),labels{step},'HorizontalAlignment','center','FontSize',13);
+        if step<numel(labels)
+            direction=sign(centers(step+1,:)-pos); offset=direction.*[0.42 0.26];
+            start=pos+offset; delta=centers(step+1,:)-offset-start;
+            quiver(ax,start(1),start(2),delta(1),delta(2),0,'k','MaxHeadSize',0.9);
+        end
+    end
+    title(ax,'计算程序的执行流程'); finish('14_workflow');
     function newfig()
         fig=figure('Color','w','Position',[100 100 1000 700],'Visible','off');
     end

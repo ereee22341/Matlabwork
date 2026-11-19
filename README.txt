@@ -8,7 +8,7 @@ F2-b 一维增透膜课程设计计算程序
 运行方法
 在 MATLAB 中打开 main.m 并运行。入口会自动定位工程目录，不需要修改绝对路径。
 也可以在命令窗口直接输入 main。
-在 MATLAB 桌面中运行时，会保留并显示全部 13 张图，默认停靠在图窗区域，
+在 MATLAB 桌面中运行时，会保留并显示全部 14 张图，默认停靠在图窗区域，
 可以切换图窗标签查看。PNG 和可编辑 FIG 文件仍同步保存在 output 文件夹。
 图题、图例、坐标轴和图窗名称使用中文，优先选择微软雅黑字体。
 物理符号、单位、函数名及数据字段保持标准写法，便于计算和数据处理。
@@ -24,7 +24,7 @@ cfg = config_f2b();
 s = fdtd_spectrum(cfg.nfilm,cfg.d0,cfg.dz,cfg);
 所有结果写入 output/；重复运行会覆盖同名结果。完整计算与绘图在本机约 17 秒。
 运行中自动验证解析解、无膜界面、能量守恒、网格收敛、运行时长敏感性和双层膜结果。
-报告和 PPT 尚未制作。
+课程报告及汇报 PPT 与代码压缩包一并提交。
 
 文件作用
 main.m              一键运行，组织全部计算、检查、数据表和绘图。
@@ -49,6 +49,7 @@ ALGORITHM.md        建模、离散公式、边界和误差定义的计算说明
 FDTD 组共同要求       output/02_yee_grid
 补充验证图           output/04_field_snapshots、07_energy_balance、
                      12_source_spectrum、13_time_sensitivity
+报告程序流程图       output/14_workflow（由 make_figures.m 生成）
 
 数据文件
 output/results.mat            全部主要计算数据、参数、误差和分析表。

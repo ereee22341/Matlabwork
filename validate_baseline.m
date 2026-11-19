@@ -12,6 +12,7 @@ bareNum=fdtd_spectrum([],[],cfg.dz,cfg);
 mask=num.valid & bareNum.valid;
 assert(all(mask(cfg.f>0)),'入射频谱未完整覆盖所需的正频率范围。');
 metrics.Rrms=sqrt(mean((num.R(mask)-theory.R(mask)).^2));
+metrics.t2rms=sqrt(mean((num.t2(mask)-theory.t2(mask)).^2));
 metrics.Trms=sqrt(mean((num.T(mask)-theory.T(mask)).^2));
 metrics.energyMax=max(abs(num.R(mask)+num.T(mask)-1));
 metrics.bareRrms=sqrt(mean((bareNum.R(mask)-bare.R(mask)).^2));
